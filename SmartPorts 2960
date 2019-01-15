@@ -1,0 +1,224 @@
+ conf t
+ macro auto global processing
+ no macro auto global control device
+ no macro auto global control detection lldp
+ no macro auto global control trigger last-resort
+ macro auto global control detection mac-address
+ macro auto global control device mac-address
+ no device-sensor filter-spec cdp all
+ macro auto mac-address-group APGroupOne
+ oui list A89D21 F4CFE2 64F69D 84B802 5C838F 80E01D D8B190 E86549 5897BD F44E05 58F39C 
+ oui list 00A6CA 74A02F D46D50 188B9D ECBD1D EC8D1D A0E0AF 286F7F 046273 54A274 A4934C
+ exit
+ macro auto mac-address-group APGroupTwo
+ oui list 7C69F6 C08C60 D867D9 FC9947 4403A7 ACF2C5 E4D3F1 60735C 4C0082 6C2056 E02F6D 
+ oui list 00B771 00EABD B08BCF 502FA8 A09351 BC26C7 780CF0 7079B3 700F6A 2CD02D
+ !
+ exit
+ macro auto mac-address-group SwitchGroupOne
+ oui list 10BD18 0CD996 64D814 00E16D 544A00 7C95F3 70105C AC7E8A 382056 F0B2E5 00DA55 008731   
+ oui list B8621F D0C282 C47295 5835D9 2834A2 C80084 204C9E 40A6E8 88908D BCC493 1CAA07 58BFEA
+ oui list B4E9B0
+ exit
+ macro auto mac-address-group SwitchGroupTwo
+ oui list 04C5A4 24B657 F07816 9C57AD 0C2724 00AF1F 0C1167 046C9D 00EBD5 009E1E 005F86 001F9D 
+ oui list 0021D7 001C0F 001F26 001DE5 2C36F8 001DE6 2893FE DC7B94 8CB64F A40CC3 500604 E84040
+ exit
+ macro auto mac-address-group SwitchGroupThree
+ oui list 001E79 0021A1 001E49 ACA016 00574C 00220C 1C17D3 001EBD B4E9B0
+ exit    
+!
+ macro auto mac-address-group CCTV
+ oui list 00408C B8CA3A ACCC8E
+exit
+do wr
+!
+macro auto execute CCTV {
+     if [[ $LINKUP == YES ]]; then
+         conf t
+             interface  $INTERFACE
+                 macro description $TRIGGER
+                 description CCTV CAM X
+                 switchport mode access
+                 switchport access vlan 210
+                 switchport nonegotiate
+                 mls qos trust cos
+                 storm-control broadcast level 10.00
+                 storm-control multicast level 30.00
+                 storm-control action trap
+                 spanning-tree portfast
+             exit
+         end
+     fi
+     if [[ $LINKUP == NO ]]; then
+         conf t
+             interface  $INTERFACE
+                 no macro description
+                 no mls qos trust cos
+                 if [[ $AUTH_ENABLED == NO ]]; then
+                     description NON PROVISIONED VLAN 100
+                     switchport mode access
+                     switchport access vlan 100
+                     spanning-tree portfast
+                 fi
+             exit
+         end
+     fi
+ } 
+macro auto execute SwitchGroupOne {
+     if [[ $LINKUP == YES ]]; then
+         conf t
+             interface  $INTERFACE
+                 macro description $TRIGGER
+                 description TRUNK-TO-XX
+                 switchport mode trunk
+                 switchport nonegotiate
+                 mls qos trust cos
+                 storm-control broadcast level 10.00
+                 storm-control multicast level 30.00
+                 storm-control action trap
+             exit
+         end
+     fi
+     if [[ $LINKUP == NO ]]; then
+         conf t
+             interface  $INTERFACE
+                 no macro description
+                 no mls qos trust cos
+                 if [[ $AUTH_ENABLED == NO ]]; then
+                     description NON PROVISIONED VLAN 100
+                     switchport mode access
+                     switchport access vlan 100
+                     spanning-tree portfast
+                 fi
+             exit
+         end
+     fi
+ } 
+macro auto execute SwitchGroupTwo {
+     if [[ $LINKUP == YES ]]; then
+         conf t
+             interface  $INTERFACE
+                 macro description $TRIGGER
+                 description TRUNK-TO-XX               
+                 switchport mode trunk
+                 switchport nonegotiate
+                 mls qos trust cos
+                 storm-control broadcast level 10.00
+                 storm-control multicast level 30.00
+                 storm-control action trap
+             exit
+         end
+     fi
+     if [[ $LINKUP == NO ]]; then
+         conf t
+             interface  $INTERFACE
+                 no macro description
+                 no mls qos trust cos
+                 if [[ $AUTH_ENABLED == NO ]]; then
+                     description NON PROVISIONED VLAN 100
+                     switchport mode access
+                     switchport access vlan 100
+                     spanning-tree portfast
+                 fi
+             exit
+         end
+     fi
+ } 
+ macro auto execute SwitchGroupThree {
+     if [[ $LINKUP == YES ]]; then
+         conf t
+             interface  $INTERFACE
+                 macro description $TRIGGER
+                 description TRUNK-TO-XX                 
+                 switchport mode trunk
+                 switchport nonegotiate
+                 mls qos trust cos
+                 storm-control broadcast level 10.00
+                 storm-control multicast level 30.00
+                 storm-control action trap
+             exit
+         end
+     fi
+     if [[ $LINKUP == NO ]]; then
+         conf t
+             interface  $INTERFACE
+                 no macro description
+                 no mls qos trust cos
+                 if [[ $AUTH_ENABLED == NO ]]; then
+                     description NON PROVISIONED VLAN 100
+                     switchport mode access
+                     switchport access vlan 100
+                     spanning-tree portfast
+                 fi
+             exit
+         end
+     fi
+ } 
+
+macro auto execute APGroupOne {
+     if [[ $LINKUP == YES ]]; then
+         conf t
+             interface  $INTERFACE
+                 macro description $TRIGGER
+                 description APXX
+                 switchport mode access
+                 switchport access vlan 301
+                 switchport nonegotiate
+                 mls qos trust cos
+                 storm-control broadcast level 10.00
+                 storm-control multicast level 30.00
+                 storm-control action trap
+                 spanning-tree portfast
+             exit
+         end
+     fi
+     if [[ $LINKUP == NO ]]; then
+         conf t
+             interface  $INTERFACE
+                 no macro description
+                 no mls qos trust cos
+                 if [[ $AUTH_ENABLED == NO ]]; then
+                     description NON PROVISIONED VLAN 100
+                     switchport mode access
+                     switchport access vlan 100
+                     spanning-tree portfast
+                 fi
+             exit
+         end
+     fi
+ } 
+ macro auto execute APGroupTwo {
+     if [[ $LINKUP == YES ]]; then
+         conf t
+             interface  $INTERFACE
+                 macro description $TRIGGER
+                 description APXX
+                 switchport mode access
+                 switchport access vlan 301
+                 switchport nonegotiate
+                 mls qos trust cos
+                 storm-control broadcast level 10.00
+                 storm-control multicast level 30.00
+                 storm-control action trap
+                 spanning-tree portfast
+             exit
+         end
+     fi
+     if [[ $LINKUP == NO ]]; then
+         conf t
+             interface  $INTERFACE
+                 no macro description
+                 no mls qos trust cos
+                 if [[ $AUTH_ENABLED == NO ]]; then
+                     description NON PROVISIONED VLAN 100
+                     switchport mode access
+                     switchport access vlan 100
+                     spanning-tree portfast
+                 fi
+             exit
+         end
+     fi
+ } 
+ no vstack
+ do wr
