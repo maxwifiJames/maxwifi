@@ -1,0 +1,449 @@
+!
+host MW-SW13-xx
+!
+int vlan 1
+desc MGMT-VLAN-SVI
+ip add 10.1.13.xx 255.255.0.0
+no shut
+!
+int vlan 301
+desc AP-MGMT-VLAN
+ip add  10.31.13.XX 255.255.0.0
+no shut
+vtp mode trans
+!
+vtp mode trans
+!
+service timestamps debug datetime localtime
+service timestamps log datetime localtime
+!
+!
+username maxwifi pri 15 pass 0 S0!stic3
+!
+ip default-gateway 10.1.0.1
+!
+ip domain-name maxwifi.local
+!
+!
+no ip domain-lookup
+!
+span mode rapid
+!
+no ip http server
+no ip http secure-server
+!
+clock timezone get 0
+clock summer-time but recurring last Sun Mar 1:00 4 Sun Oct 1:00
+!
+snmp-server group PRIVGROUP v3 auth 
+snmp-server community maxwifiSNMP RO
+snmp-server location MaxWiFi Event Network
+snmp-server contact Max WiFi - www.maxwifi.co.uk
+snmp-server user maxwifi PRIVGROUP v3 auth md5 S0!stic3
+!
+lldp run
+!
+errdisable recovery interval 300
+!
+!
+ip igmp snooping
+!
+line con 0
+login local
+logg sync
+!
+line vty 0 4
+login local
+logg sync
+!
+line vty 5 15
+login local
+!
+ntp server 77.108.128.123 prefer
+ntp server 10.1.0.1
+!
+banner login >
+**********************************************************************
+                                Warning:                              
+          You are attempting to access a restricted system!          
+**********************************************************************
+
+$(hostname).$(domain)
+
+You are attempting to access a network device managed by 
+Max WiFi.
+
+You are required to have a personal authorisation from the system
+administrator before you use this system.
+
+Unauthorised access to or misuse of this system is prohibited and may
+constitute an offence under the Computer Misuse Act 1998.
+
+All access attempts are logged.
+
+**********************************************************************
+>
+!
+!
+vtp mode trans
+!
+vlan internal allocation policy ascending
+!
+vlan 2
+name MULTICAST
+!
+vlan 31
+name PYLON-CAPWAP
+!
+vlan 41
+name MERAKI
+!
+vlan 81
+name DARK-VLAN-01
+!
+vlan 82
+name DARK-VLAN-02
+!
+vlan 83
+name DARK-VLAN-03
+!
+vlan 84
+name DARK-VLAN-04
+!
+vlan 85
+name DARK-VLAN-05
+!
+vlan 100
+name NON-PROVISIONED
+!
+vlan 200
+name CISCO-VOICE
+!
+vlan 201
+name PRODUCTION-1
+!
+vlan 202
+name PRODUCTION-2
+!
+vlan 203
+name MEDIA-1
+!
+vlan 204
+name MEDIA-2
+!
+vlan 205
+name PUBLIC-1
+!
+vlan 206
+name PUBLIC-2
+!
+vlan 207
+name REGISTRATION
+!
+vlan 208
+name DEMOS
+!
+vlan 209
+name STAGE
+!
+vlan 210
+name VIP
+!
+vlan 211
+name SPARE
+!
+vlan 212
+name SPARE
+!
+vlan 213
+name SPARE
+!
+vlan 214
+name SPARE
+!
+vlan 215
+name SPARE
+!
+vlan 216
+name SPARE
+!
+vlan 217
+name SPARE
+!
+vlan 218
+name SPARE
+!
+vlan 219
+name SPARE
+!
+vlan 220
+name SPARE
+!
+vlan 301
+name MW-CAPWAP
+!
+vlan 302
+name BT2
+!
+vlan 303
+name BT3
+!
+vlan 304
+name BT4
+!
+vlan 305
+name BT5
+!
+vlan 601
+name REAL-WORLD
+!
+int range gi1/0/23-28
+description TRUNK
+switchport mode trunk
+switchport nonegotiate
+storm-control broadcast level 1.00
+storm-control multicast level 30.00
+storm-control action trap
+!
+int ran gi1/0/13-22
+description NON-PROVISIONED
+switchport access vlan 100
+switchport mode access
+switchport nonegotiate
+!
+int ran gi1/0/1-12
+description APXX
+switchport mode access
+switchport nonegotiate
+storm-control broadcast level 1.00
+storm-control multicast level 30.00
+storm-control action trap
+exit
+!
+ macro auto global processing
+ no macro auto global control device
+ no macro auto global control detection lldp
+ no macro auto global control trigger last-resort
+ macro auto global control detection mac-address
+ macro auto global control device mac-address
+ no device-sensor filter-spec cdp all
+ macro auto mac-address-group APGroupOne
+ oui list A89D21 F4CFE2 64F69D 84B802 5C838F 80E01D D8B190 E86549 5897BD F44E05 58F39C 
+ oui list 00A6CA 74A02F D46D50 188B9D ECBD1D EC8D1D A0E0AF 286F7F 046273 54A274 A4934C
+ exit
+ macro auto mac-address-group APGroupTwo
+ oui list 7C69F6 C08C60 D867D9 FC9947 4403A7 ACF2C5 E4D3F1 60735C 4C0082 6C2056 E02F6D 
+ oui list 00B771 00EABD B08BCF 502FA8 A09351 BC26C7 780CF0 7079B3 700F6A 2CD02D
+ !
+ exit
+ macro auto mac-address-group SwitchGroupOne
+ oui list 10BD18 0CD996 64D814 00E16D 544A00 7C95F3 70105C AC7E8A 382056 F0B2E5 00DA55 008731   
+ oui list B8621F D0C282 C47295 5835D9 2834A2 C80084 204C9E 40A6E8 88908D BCC493 1CAA07 58BFEA
+ oui list B4E9B0
+ exit
+ macro auto mac-address-group SwitchGroupTwo
+ oui list 04C5A4 24B657 F07816 9C57AD 0C2724 00AF1F 0C1167 046C9D 00EBD5 009E1E 005F86 001F9D 
+ oui list 0021D7 001C0F 001F26 001DE5 2C36F8 001DE6 2893FE DC7B94 8CB64F A40CC3 500604 E84040
+ exit
+ macro auto mac-address-group SwitchGroupThree
+ oui list 001E79 0021A1 001E49 ACA016 00574C 00220C 1C17D3 001EBD B4E9B0
+ exit    
+!
+ macro auto mac-address-group CCTV
+ oui list 00408C B8CA3A ACCC8E
+exit
+do wr
+!
+macro auto execute CCTV {
+     if [[ $LINKUP == YES ]]; then
+         conf t
+             interface  $INTERFACE
+                 macro description $TRIGGER
+                 description CCTV CAM X
+                 switchport mode access
+                 switchport access vlan 210
+                 switchport nonegotiate
+                 mls qos trust cos
+                 storm-control broadcast level 10.00
+                 storm-control multicast level 30.00
+                 storm-control action trap
+                 spanning-tree portfast
+             exit
+         end
+     fi
+     if [[ $LINKUP == NO ]]; then
+         conf t
+             interface  $INTERFACE
+                 no macro description
+                 no mls qos trust cos
+                 if [[ $AUTH_ENABLED == NO ]]; then
+                     description NON PROVISIONED VLAN 100
+                     switchport mode access
+                     switchport access vlan 100
+                     spanning-tree portfast
+                 fi
+             exit
+         end
+     fi
+ } 
+macro auto execute SwitchGroupOne {
+     if [[ $LINKUP == YES ]]; then
+         conf t
+             interface  $INTERFACE
+                 macro description $TRIGGER
+                 description TRUNK-TO-XX
+                 switchport mode trunk
+                 switchport nonegotiate
+                 mls qos trust cos
+                 storm-control broadcast level 10.00
+                 storm-control multicast level 30.00
+                 storm-control action trap
+             exit
+         end
+     fi
+     if [[ $LINKUP == NO ]]; then
+         conf t
+             interface  $INTERFACE
+                 no macro description
+                 no mls qos trust cos
+                 if [[ $AUTH_ENABLED == NO ]]; then
+                     description NON PROVISIONED VLAN 100
+                     switchport mode access
+                     switchport access vlan 100
+                     spanning-tree portfast
+                 fi
+             exit
+         end
+     fi
+ } 
+macro auto execute SwitchGroupTwo {
+     if [[ $LINKUP == YES ]]; then
+         conf t
+             interface  $INTERFACE
+                 macro description $TRIGGER
+                 description TRUNK-TO-XX               
+                 switchport mode trunk
+                 switchport nonegotiate
+                 mls qos trust cos
+                 storm-control broadcast level 10.00
+                 storm-control multicast level 30.00
+                 storm-control action trap
+             exit
+         end
+     fi
+     if [[ $LINKUP == NO ]]; then
+         conf t
+             interface  $INTERFACE
+                 no macro description
+                 no mls qos trust cos
+                 if [[ $AUTH_ENABLED == NO ]]; then
+                     description NON PROVISIONED VLAN 100
+                     switchport mode access
+                     switchport access vlan 100
+                     spanning-tree portfast
+                 fi
+             exit
+         end
+     fi
+ } 
+ macro auto execute SwitchGroupThree {
+     if [[ $LINKUP == YES ]]; then
+         conf t
+             interface  $INTERFACE
+                 macro description $TRIGGER
+                 description TRUNK-TO-XX                 
+                 switchport mode trunk
+                 switchport nonegotiate
+                 mls qos trust cos
+                 storm-control broadcast level 10.00
+                 storm-control multicast level 30.00
+                 storm-control action trap
+             exit
+         end
+     fi
+     if [[ $LINKUP == NO ]]; then
+         conf t
+             interface  $INTERFACE
+                 no macro description
+                 no mls qos trust cos
+                 if [[ $AUTH_ENABLED == NO ]]; then
+                     description NON PROVISIONED VLAN 100
+                     switchport mode access
+                     switchport access vlan 100
+                     spanning-tree portfast
+                 fi
+             exit
+         end
+     fi
+ } 
+
+macro auto execute APGroupOne {
+     if [[ $LINKUP == YES ]]; then
+         conf t
+             interface  $INTERFACE
+                 macro description $TRIGGER
+                 description APXX
+                 switchport mode access
+                 switchport access vlan 301
+                 switchport nonegotiate
+                 mls qos trust cos
+                 storm-control broadcast level 10.00
+                 storm-control multicast level 30.00
+                 storm-control action trap
+                 spanning-tree portfast
+             exit
+         end
+     fi
+     if [[ $LINKUP == NO ]]; then
+         conf t
+             interface  $INTERFACE
+                 no macro description
+                 no mls qos trust cos
+                 if [[ $AUTH_ENABLED == NO ]]; then
+                     description NON PROVISIONED VLAN 100
+                     switchport mode access
+                     switchport access vlan 100
+                     spanning-tree portfast
+                 fi
+             exit
+         end
+     fi
+ } 
+ macro auto execute APGroupTwo {
+     if [[ $LINKUP == YES ]]; then
+         conf t
+             interface  $INTERFACE
+                 macro description $TRIGGER
+                 description APXX
+                 switchport mode access
+                 switchport access vlan 301
+                 switchport nonegotiate
+                 mls qos trust cos
+                 storm-control broadcast level 10.00
+                 storm-control multicast level 30.00
+                 storm-control action trap
+                 spanning-tree portfast
+             exit
+         end
+     fi
+     if [[ $LINKUP == NO ]]; then
+         conf t
+             interface  $INTERFACE
+                 no macro description
+                 no mls qos trust cos
+                 if [[ $AUTH_ENABLED == NO ]]; then
+                     description NON PROVISIONED VLAN 100
+                     switchport mode access
+                     switchport access vlan 100
+                     spanning-tree portfast
+                 fi
+             exit
+         end
+     fi
+ } 
+ no vstack
+ do wr
+
+write
+
+
