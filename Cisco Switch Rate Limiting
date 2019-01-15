@@ -1,0 +1,36 @@
+###### RATE LIMIT CONF #######
+
+
+conf t
+!
+mls qos
+!
+ip access-list extended 111 permit ip any any
+!
+class-map match-all 20mbs-c
+  match access-group 111
+class-map match-all 100mbs-c
+  match access-group 111
+class-map match-all 50mbs-c
+  match access-group 111
+!
+policy-map 100mbps
+ class 100mbs-c
+  police 100000000 1000000 exceed-action drop
+policy-map 20mbps
+ class 20mbs-c
+  police 20000000 550000 exceed-action drop
+policy-map 50mbps
+ class 50mbs-c
+  police 50000000 850000 exceed-action drop
+!
+ description 50Mbps-Public IP VLAN 601
+ switchport access vlan 601
+ switchport mode access
+ switchport nonegotiate
+ speed 100
+ srr-queue bandwidth limit 50
+ spanning-tree portfast
+ service-policy input 50mbps
+ !
+end
